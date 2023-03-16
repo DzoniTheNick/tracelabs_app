@@ -13,7 +13,7 @@ const getCurrentEtherBalance = async (address: string, tag: string): Promise<str
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! == 1) {
+    if(json.status! === 1) {
         const balance: bigint = ethers.getBigInt(json.result!);
         return `${ethers.formatEther(balance)} ${baseSymbol}`   
     }else {
@@ -34,7 +34,7 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
     const response: Response = await fetch(uri);
     const json = await response.json();
     
-    if(json.status! == 1) {
+    if(json.status! === 1) {
         const transactions = json.result! as NormalTx[];
         const formatedTx: FormatedNormalTx[] = [];
 
@@ -61,7 +61,7 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! == 1) {
+    if(json.status! === 1) {
         const transactions = json.result! as TokenTx[];
         const formatedTx: FormatedTokenTx[] = [];
 
