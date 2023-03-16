@@ -121,4 +121,4 @@ const formatTokenTx = (transaction: TokenTx, baseSymbol: string): FormatedTokenT
     return formatedTokenTx;
 };
 
-export { NormalTx, FormatedNormalTx, TokenTx, FormatedTokenTx, formatNormalTx, formatTokenTx };
+export { type NormalTx, type FormatedNormalTx, type TokenTx, type FormatedTokenTx, formatNormalTx, formatTokenTx };
