@@ -7,23 +7,25 @@ const etherscanKey: string = process.env.REACT_APP_ETHERSCAN_KEY!;
 const infuraUri: string = process.env.REACT_APP_INFURA_MAINNET_URI!;
 const infuraKey: string = process.env.REACT_APP_INFURA_KEY!;
 
-const getCurrentEtherBalance = async (address: string, tag: string): Promise<string> => {
-    const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=${tag}&apikey=${etherscanKey}`;
+const getCurrentEtherBalance = async (address: string): Promise<string | object> => {
+    const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=latest&apikey=${etherscanKey}`;
     
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const balance: bigint = ethers.getBigInt(json.result!);
         return `${ethers.formatEther(balance)} ${baseSymbol}`   
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        return {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
     };
 };
 
-const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | string>=> {
+const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | object>=> {
 
     if(!startBlock) {
         startBlock = 0;
@@ -44,13 +46,15 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
 
         return formatedTx;
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        return {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
     };
 };
 
-const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | string> => {
+const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | object> => {
 
     if(!startBlock) {
         startBlock = 0;
@@ -71,9 +75,11 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
 
         return formatedTx;
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        return {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
     };
 };
 
@@ -84,12 +90,12 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     };
 
     let frmNormalTx: any = await getNormalTransactions(address, startBlock);
-    if(typeof(frmNormalTx) === 'string') {
+    if(frmNormalTx instanceof Object) {
         frmNormalTx = [];
     };
 
     let frmTokenTx: any = await getTokenTransactions(address, startBlock);
-    if(typeof(frmNormalTx) === 'string') {
+    if(frmNormalTx instanceof Object) {
         frmTokenTx = [];
     };
 
@@ -121,7 +127,7 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     return allTx;
 };
 
-const getBalanceAtTime = async (date: Date, address: string) => {
+const getBalanceAtTime = async (date: Date, address: string): Promise<string> => {
 
     const timeStamp: number = Math.floor(date.getTime() / 1000);
 
@@ -153,7 +159,7 @@ const getBalanceAtTime = async (date: Date, address: string) => {
     json = await response.json();
     const balance: string = parseInt(json.result!, 16).toString();
 
-    console.log(`${ethers.formatEther(balance)} ${baseSymbol}`);
+    return `${ethers.formatEther(balance)} ${baseSymbol}`;
 };
 
 export { getCurrentEtherBalance, getNormalTransactions, getTokenTransactions, getBalanceAtTime, getAllTransactions };

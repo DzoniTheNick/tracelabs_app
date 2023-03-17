@@ -7,8 +7,8 @@ const etherscanKey: string = process.env.REACT_APP_ETHERSCAN_KEY!;
 const infuraUri: string = process.env.REACT_APP_INFURA_GOERLI_URI!;
 const infuraKey: string = process.env.REACT_APP_INFURA_KEY!;
 
-const getCurrentEtherBalance = async (address: string, tag: string): Promise<string> => {
-    const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=${tag}&apikey=${etherscanKey}`;
+const getCurrentEtherBalance = async (address: string): Promise<string> => {
+    const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=latest&apikey=${etherscanKey}`;
     
     const response: Response = await fetch(uri);
     const json = await response.json();
