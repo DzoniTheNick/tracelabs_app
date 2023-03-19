@@ -103,7 +103,6 @@ const getEtherBalance = async (address: string, block?: number): Promise<Specifi
     };
 };
 
-
 const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | ErrorMessage>=> {
 
     if(!startBlock) {

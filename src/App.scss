@@ -13,7 +13,6 @@ $total-fees: 120px;
 
 $balances_width: 150px;
 $balances_height: 100px;
-
 $balance_height: 50px;
 
 $row_height: 40px;
@@ -234,6 +233,10 @@ $row_height: 40px;
 
                 #sb-date:hover {
                     cursor: pointer;
+                }
+
+                #sb-date:focus {
+                    outline: none;
                 }
 
                 #sb-balance {
