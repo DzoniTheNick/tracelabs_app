@@ -9,7 +9,7 @@ import { getLatestBlock, getEtherBalance, getBlockHeight, getAllTransactions } f
 import { errorBackgroundColor, errorBorder, normalBackgroundColor, normalBorder } from './utils/values';
 
 import search from './res/png/search.png';
-import Loading from './components/loading/loading';
+import Loading from './components/Loading/Loading';
 
 const App = () => {
 
@@ -116,7 +116,7 @@ const App = () => {
     const balance: SpecificBalance | ErrorMessage = await getEtherBalance(address);
 
     // Checking if address is valid
-    if((balance as ErrorMessage).problem) {
+    if((balance as ErrorMessage).problem || !address) {
       setFinished(true);
       setCurrentBalance('XX.XX');
       setSpecificBalance('XX.XX');
