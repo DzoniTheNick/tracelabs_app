@@ -12,8 +12,6 @@
 
     p {
         margin: 0;
-
-        color: $p_color;
     } 
 
     a {
@@ -28,6 +26,8 @@
         font-size: 1.2rem;
         font-family: 'Roboto';
         font-weight: 400;
+
+        color: $p_color;
     }
 
     #tx-header {
@@ -116,6 +116,8 @@
 
             thead {
                 tr {
+                    height: 30px;
+
                     #type {
                         width: $type_width;
                         height: 20px;
@@ -185,11 +187,10 @@
 
                     #type {
                         width: $type_width;
-                        height: 20px;
+                        height: 12px;
                         
                         p {
                             text-align: center;
-                            color: $p_color;
                         }
                     }
                     #hash {

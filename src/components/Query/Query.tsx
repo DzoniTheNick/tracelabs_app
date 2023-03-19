@@ -68,7 +68,6 @@ const Query: FC<queryProps> = ({
         </p>
       </div>
     )
-}
-
+};
 
 export default Query;

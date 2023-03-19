@@ -16,9 +16,9 @@ const normalTxStyle: React.CSSProperties = {
 };
 
 const tokenTxStyle: React.CSSProperties = {
-    background: 'rgba(0, 161, 134, 0.1)',
-    color: 'rgba(0, 161, 134, 1)',
-    border: '1px solid rgba(0, 161, 134, 1)',
+    background: 'rgba(204, 154, 6, 0.15)',
+    color: 'rgba(204, 154, 6, 1)',
+    border: '1px solid rgba(204, 154, 6, 1)',
     borderRadius: '5px'
 };
 

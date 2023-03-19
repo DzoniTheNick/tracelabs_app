@@ -1,7 +1,10 @@
 {
   "homepage": "http://DzoniTheNick.github.io/tracelabs_app",
   "name": "tracelabs_app",
-  "version": "0.1.0",
+  "version": "1.0.2",
+  "engines": {
+    "node": ">=18.13.0"
+  },
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
@@ -48,6 +51,7 @@
   },
   "devDependencies": {
     "gh-pages": "^5.0.0",
+    "react-device-detect": "^2.2.3",
     "react-dotenv": "^0.1.3"
   }
 }

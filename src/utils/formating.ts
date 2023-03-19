@@ -22,12 +22,14 @@ const createTableRow = (transaction: FormatedNormalTx | FormatedTokenTx): React.
     let style: React.CSSProperties = normalTxStyle;
 
     if((transaction as FormatedTokenTx).tokenName) {
-    style = tokenTxStyle;
-    }
+        style = tokenTxStyle;
+    };
+
+    console.log(tokenTxStyle);
 
     const tableRow = React.createElement("tr", undefined, [
-        React.createElement("td", {id: 'type'}, [
-            React.createElement("p", {style: style}, transaction.type)
+        React.createElement("td", { id: 'type' }, [
+            React.createElement("p", { style: style }, transaction.type)
         ]),
         React.createElement("td", {id: 'hash'}, [
             React.createElement("a", {href: hash, target: '_blank', rel:'noreferrer', style: {textDecoration: 'none'}}, [
