@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/tracelabs_app/static/css/main.bd52d2f3.css",
-    "main.js": "/tracelabs_app/static/js/main.a76c1da2.js",
+    "main.css": "/tracelabs_app/static/css/main.14ab5dbc.css",
+    "main.js": "/tracelabs_app/static/js/main.cda89434.js",
     "static/media/loading.gif": "/tracelabs_app/static/media/loading.54ade4c5c180d989ec39.gif",
     "static/media/search.png": "/tracelabs_app/static/media/search.db32fb27ba2097096634.png",
     "index.html": "/tracelabs_app/index.html",
-    "main.bd52d2f3.css.map": "/tracelabs_app/static/css/main.bd52d2f3.css.map",
-    "main.a76c1da2.js.map": "/tracelabs_app/static/js/main.a76c1da2.js.map"
+    "main.14ab5dbc.css.map": "/tracelabs_app/static/css/main.14ab5dbc.css.map",
+    "main.cda89434.js.map": "/tracelabs_app/static/js/main.cda89434.js.map"
   },
   "entrypoints": [
-    "static/css/main.bd52d2f3.css",
-    "static/js/main.a76c1da2.js"
+    "static/css/main.14ab5dbc.css",
+    "static/js/main.cda89434.js"
   ]
 }
