@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { NormalTx, FormatedNormalTx, formatNormalTx, TokenTx, FormatedTokenTx, formatTokenTx } from './utils';
+import { NormalTx, FormatedNormalTx, formatNormalTx, TokenTx, ErrorMessage, FormatedTokenTx, formatTokenTx } from './utils';
 
 const baseSymbol: string = process.env.REACT_APP_GOERLI_SYMBOL!;
 const etherscanUri: string = process.env.REACT_APP_ETHERSCAN_GOERLI_URI!;
@@ -7,23 +7,27 @@ const etherscanKey: string = process.env.REACT_APP_ETHERSCAN_KEY!;
 const infuraUri: string = process.env.REACT_APP_INFURA_GOERLI_URI!;
 const infuraKey: string = process.env.REACT_APP_INFURA_KEY!;
 
-const getCurrentEtherBalance = async (address: string): Promise<string> => {
+const getCurrentEtherBalance = async (address: string): Promise<string | ErrorMessage> => {
     const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=latest&apikey=${etherscanKey}`;
     
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const balance: bigint = ethers.getBigInt(json.result!);
-        return `${ethers.formatEther(balance)} ${baseSymbol}`   
+        const convertedBalance: string = ((+ethers.formatEther(balance)).toFixed(5)).toString();
+        return `${convertedBalance} ${baseSymbol}`   
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        const errorMessage: ErrorMessage = {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
+        return errorMessage;
     };
 };
 
-const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | string>=> {
+const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | ErrorMessage>=> {
 
     if(!startBlock) {
         startBlock = 0;
@@ -34,7 +38,7 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
     const response: Response = await fetch(uri);
     const json = await response.json();
     
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const transactions = json.result! as NormalTx[];
         const formatedTx: FormatedNormalTx[] = [];
 
@@ -44,13 +48,16 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
 
         return formatedTx;
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        const errorMessage: ErrorMessage = {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
+        return errorMessage;
     };
 };
 
-const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | string> => {
+const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | ErrorMessage> => {
 
     if(!startBlock) {
         startBlock = 0;
@@ -61,7 +68,7 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const transactions = json.result! as TokenTx[];
         const formatedTx: FormatedTokenTx[] = [];
 
@@ -71,9 +78,12 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
 
         return formatedTx;
     }else {
-        return `Error while reading current account balance: 
-            Message: ${json.message!}
-            Result: ${json.result!}`;
+        const errorMessage: ErrorMessage = {
+            problem: 'Error while reading current account balance',
+            message: json.message!,
+            result: json.result!
+        };
+        return errorMessage;
     };
 };
 
@@ -84,12 +94,12 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     };
 
     let frmNormalTx: any = await getNormalTransactions(address, startBlock);
-    if(typeof(frmNormalTx) === 'string') {
+    if((frmNormalTx as ErrorMessage).message) {
         frmNormalTx = [];
     };
 
     let frmTokenTx: any = await getTokenTransactions(address, startBlock);
-    if(typeof(frmNormalTx) === 'string') {
+    if((frmNormalTx as ErrorMessage).message) {
         frmTokenTx = [];
     };
 
@@ -121,16 +131,23 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     return allTx;
 };
 
-const getBalanceAtTime = async (date: Date, address: string) => {
+const getBalanceAtTime = async (date: string, address: string): Promise<string | ErrorMessage> => {
 
-    const timeStamp: number = Math.floor(date.getTime() / 1000);
-
+    let formatedDate: Date = new Date(date);
+    formatedDate.setUTCHours(0, 0, 0, 0);
+    const timeStamp: number = Math.floor(formatedDate.getTime() / 1000);
+     
     let uri: string = `${etherscanUri}?module=block&action=getblocknobytime&timestamp=${timeStamp}&closest=before&apikey=${etherscanKey}`;
 
     let response: Response = await fetch(uri);
     let json = await response.json();
     const block: number = Number(json.result!);
-    
+
+    console.log(uri);
+    console.log(formatedDate.toUTCString());
+    console.log(timeStamp);
+    console.log(json);
+
     uri = `${infuraUri}/${infuraKey}`;
     const data: object = {
         "jsonrpc": "2.0",
@@ -151,9 +168,22 @@ const getBalanceAtTime = async (date: Date, address: string) => {
 
     response = await fetch(uri, options);
     json = await response.json();
-    const balance: string = parseInt(json.result!, 16).toString();
 
-    console.log(`${ethers.formatEther(balance)} ${baseSymbol}`);
+    console.log(json);
+
+    if(json.error) {
+        const errorMessage: ErrorMessage = {
+            problem: 'Error while reading current account balance',
+            message: json.error.message!,
+            result: json.error.code!
+        };
+        return errorMessage;
+    }else {
+        const balance: string = (parseInt(json.result!, 16)).toString();
+        const convertedBalance: string = ((+ethers.formatEther(balance)).toFixed(5)).toString();
+    
+        return `${convertedBalance} ${baseSymbol}`;
+    };
 };
 
 export { getCurrentEtherBalance, getNormalTransactions, getTokenTransactions, getBalanceAtTime, getAllTransactions };

@@ -22,15 +22,13 @@ interface NormalTx {
 };
 
 interface FormatedNormalTx {
-    blockNumber: string,
-    blockHash: string,
+    type: string,
     txHash: string,
     timeStamp: string,
     date: Date,
     from: string,
     to: string,
     value: string,
-    txFee: string,
     totalFee: string
 };
 
@@ -57,8 +55,7 @@ interface TokenTx {
 };
 
 interface FormatedTokenTx {
-    blockNumber: string,
-    blockHash: string,
+    type: string,
     txHash: string,
     timeStamp: string,
     date: Date,
@@ -69,27 +66,52 @@ interface FormatedTokenTx {
     tokenName: string,
     tokenSymbol: string,
     tokenDecimal: string,
-    txFee: string,
     totalFee: string
+};
+
+interface SpecificBalance {
+    blockHeight: string,
+    balance: string
+};
+
+interface ErrorMessage {
+    problem: string,
+    message: string,
+    result: string
+}
+
+const formateDate = (date: Date): string => {
+    const year: string = (date.getUTCFullYear()).toString();
+
+    let month: string = (date.getUTCMonth() + 1).toString();
+    if(month.length < 2) {
+        month = `0${month}`;
+    };
+    
+    let day: string = (date.getUTCDate()).toString();
+    if(day.length < 2) {
+        day = `0${day}`;
+    };
+
+    return `${year}-${month}-${day}`;
 };
 
 const formatNormalTx = (transaction: NormalTx, baseSymbol: string): FormatedNormalTx => {
 
     const value: bigint = ethers.getBigInt(transaction.value);
+    const formatedValue: string = ((+ethers.formatEther(value)).toFixed(5)).toString(); 
     const txFee: bigint = ethers.getBigInt(transaction.gasPrice) * ethers.getBigInt(transaction.gasUsed);
     const totalFee: bigint = value + txFee;
 
     const formatedNormalTx: FormatedNormalTx = {
-        blockNumber: transaction.blockNumber,
-        blockHash: transaction.blockHash,
+        type: 'Normal Tx',
         txHash: transaction.hash,
         timeStamp: transaction.timeStamp,
         date: new Date(+transaction.timeStamp * 1000),
         from: transaction.from,
         to: transaction.to,
-        value: `${ethers.formatEther(value)} ${baseSymbol}`,
-        txFee: `${ethers.formatEther(txFee)} ${baseSymbol}`,
-        totalFee: `${ethers.formatEther(totalFee)} ${baseSymbol}`
+        value: `${formatedValue} ${baseSymbol}`,
+        totalFee: `${(+ethers.formatEther(totalFee)).toFixed(5)} ${baseSymbol}`
     };
 
     return formatedNormalTx;
@@ -97,13 +119,13 @@ const formatNormalTx = (transaction: NormalTx, baseSymbol: string): FormatedNorm
 
 const formatTokenTx = (transaction: TokenTx, baseSymbol: string): FormatedTokenTx => {
 
-    const value: string = ethers.formatUnits(ethers.getBigInt(transaction.value), +transaction.tokenDecimal);
+    let value: string = ethers.formatUnits(ethers.getBigInt(transaction.value), +transaction.tokenDecimal);
+    value = ((+value).toFixed(5)).toString();
     const txFee: bigint = ethers.getBigInt(transaction.gasPrice) * ethers.getBigInt(transaction.gasUsed);
     const totalFee: bigint = ethers.getBigInt('0') + txFee;
 
     const formatedTokenTx: FormatedTokenTx = {
-        blockNumber: transaction.blockNumber,
-        blockHash: transaction.blockHash,
+        type: 'Token Tx',
         txHash: transaction.hash,
         timeStamp: transaction.timeStamp,
         date: new Date(+transaction.timeStamp * 1000),
@@ -114,11 +136,10 @@ const formatTokenTx = (transaction: TokenTx, baseSymbol: string): FormatedTokenT
         tokenName: transaction.tokenName,
         tokenSymbol: transaction.tokenSymbol,
         tokenDecimal: transaction.tokenDecimal,
-        txFee: `${ethers.formatEther(txFee)} ${baseSymbol}`,
-        totalFee: `${ethers.formatEther(totalFee)} ${baseSymbol}`
+        totalFee: `${(+ethers.formatEther(totalFee)).toFixed(5)} ${baseSymbol}`
     };
 
     return formatedTokenTx;
 };
 
-export { type NormalTx, type FormatedNormalTx, type TokenTx, type FormatedTokenTx, formatNormalTx, formatTokenTx };
+export { type NormalTx, type FormatedNormalTx, type TokenTx, type FormatedTokenTx, type ErrorMessage, type SpecificBalance, formateDate, formatNormalTx, formatTokenTx };

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { NormalTx, FormatedNormalTx, formatNormalTx, TokenTx, FormatedTokenTx, formatTokenTx } from './utils';
+import { NormalTx, FormatedNormalTx, formatNormalTx, TokenTx, ErrorMessage, FormatedTokenTx, formatTokenTx, SpecificBalance } from './utils';
 
 const baseSymbol: string = process.env.REACT_APP_ETH_SYMBOL!;
 const etherscanUri: string = process.env.REACT_APP_ETHERSCAN_MAINNET_URI!;
@@ -7,25 +7,68 @@ const etherscanKey: string = process.env.REACT_APP_ETHERSCAN_KEY!;
 const infuraUri: string = process.env.REACT_APP_INFURA_MAINNET_URI!;
 const infuraKey: string = process.env.REACT_APP_INFURA_KEY!;
 
-const getCurrentEtherBalance = async (address: string): Promise<string | object> => {
-    const uri: string = `${etherscanUri}?module=account&action=balance&address=${address}&tag=latest&apikey=${etherscanKey}`;
+const getEtherBalance = async (address: string, block?: number): Promise<SpecificBalance | ErrorMessage> => {
     
-    const response: Response = await fetch(uri);
+    if(!block) {
+        block = await getBlockHeight(new Date());
+    };
+    
+    const uri = `${infuraUri}/${infuraKey}`;
+
+    const data: object = {
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+            `${address}`,
+            `0x${block.toString(16)}`
+        ],
+        "id": 1
+    };
+    const options: object = {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    };
+
+    const response = await fetch(uri, options);
     const json = await response.json();
 
-    if(json.status! === '1') {
-        const balance: bigint = ethers.getBigInt(json.result!);
-        return `${ethers.formatEther(balance)} ${baseSymbol}`   
-    }else {
-        return {
+    if(json.error) {
+        const errorMessage: ErrorMessage = {
             problem: 'Error while reading current account balance',
-            message: json.message!,
-            result: json.result!
+            message: json.error.message!,
+            result: json.error.code!
         };
+        return errorMessage;
+    }else {
+        const balance: string = (parseInt(json.result!, 16)).toString();
+        const convertedBalance: string = ((+ethers.formatEther(balance)).toFixed(5)).toString();
+    
+        const specificBalance: SpecificBalance = {
+            blockHeight: block.toString(),
+            balance: `${convertedBalance} ${baseSymbol}`
+        };
+
+        return specificBalance;
     };
 };
 
-const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | object>=> {
+const getBlockHeight = async (date: Date): Promise<number> => {
+
+    const timeStamp: number = Math.floor(date.getTime() / 1000);
+     
+    let uri: string = `${etherscanUri}?module=block&action=getblocknobytime&timestamp=${timeStamp}&closest=before&apikey=${etherscanKey}`;
+
+    let response: Response = await fetch(uri);
+    let json = await response.json();
+    const block: number = Number(json.result!);
+
+    return block;
+};
+
+const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | ErrorMessage>=> {
 
     if(!startBlock) {
         startBlock = 0;
@@ -36,7 +79,7 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
     const response: Response = await fetch(uri);
     const json = await response.json();
     
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const transactions = json.result! as NormalTx[];
         const formatedTx: FormatedNormalTx[] = [];
 
@@ -46,15 +89,16 @@ const getNormalTransactions = async (address: string, startBlock?: number): Prom
 
         return formatedTx;
     }else {
-        return {
+        const errorMessage: ErrorMessage = {
             problem: 'Error while reading current account balance',
             message: json.message!,
             result: json.result!
         };
+        return errorMessage;
     };
 };
 
-const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | object> => {
+const getTokenTransactions = async (address: string, startBlock?: number): Promise<FormatedTokenTx[] | ErrorMessage> => {
 
     if(!startBlock) {
         startBlock = 0;
@@ -65,7 +109,7 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
     const response: Response = await fetch(uri);
     const json = await response.json();
 
-    if(json.status! === 1) {
+    if(json.status! === '1') {
         const transactions = json.result! as TokenTx[];
         const formatedTx: FormatedTokenTx[] = [];
 
@@ -75,11 +119,12 @@ const getTokenTransactions = async (address: string, startBlock?: number): Promi
 
         return formatedTx;
     }else {
-        return {
+        const errorMessage: ErrorMessage = {
             problem: 'Error while reading current account balance',
             message: json.message!,
             result: json.result!
         };
+        return errorMessage;
     };
 };
 
@@ -90,12 +135,12 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     };
 
     let frmNormalTx: any = await getNormalTransactions(address, startBlock);
-    if(frmNormalTx instanceof Object) {
+    if((frmNormalTx as ErrorMessage).message) {
         frmNormalTx = [];
     };
 
     let frmTokenTx: any = await getTokenTransactions(address, startBlock);
-    if(frmNormalTx instanceof Object) {
+    if((frmNormalTx as ErrorMessage).message) {
         frmTokenTx = [];
     };
 
@@ -127,39 +172,4 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     return allTx;
 };
 
-const getBalanceAtTime = async (date: Date, address: string): Promise<string> => {
-
-    const timeStamp: number = Math.floor(date.getTime() / 1000);
-
-    let uri: string = `${etherscanUri}?module=block&action=getblocknobytime&timestamp=${timeStamp}&closest=before&apikey=${etherscanKey}`;
-
-    let response: Response = await fetch(uri);
-    let json = await response.json();
-    const block: number = Number(json.result!);
-    
-    uri = `${infuraUri}/${infuraKey}`;
-    const data: object = {
-        "jsonrpc": "2.0",
-        "method": "eth_getBalance",
-        "params": [
-            `${address}`,
-            `0x${block.toString(16)}`
-        ],
-        "id": 1
-    };
-    const options: object = {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    };
-
-    response = await fetch(uri, options);
-    json = await response.json();
-    const balance: string = parseInt(json.result!, 16).toString();
-
-    return `${ethers.formatEther(balance)} ${baseSymbol}`;
-};
-
-export { getCurrentEtherBalance, getNormalTransactions, getTokenTransactions, getBalanceAtTime, getAllTransactions };
+export { getEtherBalance, getBlockHeight, getNormalTransactions, getTokenTransactions, getAllTransactions };
