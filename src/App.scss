@@ -456,6 +456,10 @@ $row_height: 40px;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
                             }
+
+                            a:hover {
+                                opacity: 0.8;
+                            }
                         }
                         #time {
                             width: $time;
@@ -480,6 +484,10 @@ $row_height: 40px;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
                             }
+
+                            a:hover {
+                                opacity: 0.8;
+                            }
                         }
                         #to {
                             width: $to;
@@ -494,6 +502,10 @@ $row_height: 40px;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
+                            }
+
+                            a:hover {
+                                opacity: 0.8;
                             }
                         }
                         #value {

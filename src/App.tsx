@@ -215,8 +215,8 @@ const App = () => {
           </button>
         </div>
         <p id='notice'>
-          Notice: <br />
-          If a block number is not given the query will execute from block number 0 <br />
+          Notice:<br />
+          If a block number is not given the query will run from block #0<br />
           The query can retrieve a maximum of 20000 transactions
         </p>
       </div>
