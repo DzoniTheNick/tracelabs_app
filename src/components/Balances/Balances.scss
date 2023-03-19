@@ -1,0 +1,113 @@
+@import '../../../src/index.scss';
+
+.Balances {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+
+    border: 2px solid rgba(34, 34, 34, 1);
+    border-radius: 20px;
+    background-color: rgba(17, 17, 17, 1);
+    box-shadow: 0 0.5rem 1.2rem rgba(82, 85, 92, .15);
+
+    width: 400px;
+    height: 120px;
+
+    padding: 15px;
+
+    #header {
+        width: 100%;
+
+        margin: 0;
+        text-align: left;
+
+        color: $p_color;
+
+        font-size: 1.2rem;
+        font-family: 'Roboto';
+        font-weight: 400;
+    }
+
+    .container {
+        width: 80%;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        .current {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: $balances_width;
+            height: $balances_height;
+
+            #cb-title {
+                margin: 0;
+                color: $p_color;
+            }
+
+            #cb-balance {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                height: $balance_height;
+                
+                margin: 0;
+
+                color: $p_color;
+            }
+        }
+        .specific {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: $balances_width;
+            height: $balances_height;
+
+            .sb-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                color: $p_color;
+                #sb-title {
+                    margin: 0;
+                }       
+            }
+
+            #sb-date {
+                margin-top: 10px;
+
+                border: none;
+                border-radius: 20px;   
+            }
+
+            #sb-date:hover {
+                cursor: pointer;
+            }
+
+            #sb-date:focus {
+                outline: none;
+            }
+
+            #sb-balance {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                height: $balance_height;
+
+                margin: 0;
+
+                color: $p_color;
+            }   
+        }
+    }
+}

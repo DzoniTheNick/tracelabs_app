@@ -1,5 +1,22 @@
 @import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
 
+$p_color: rgb(245, 245, 245);
+$a_color: rgb(106, 181, 219);
+
+$type_width: 80px;
+$hash_width: 160px;
+$time: 140px;
+$from: 150px;
+$to: 150px;
+$value: 200px;
+$total-fees: 120px;
+
+$balances_width: 150px;
+$balances_height: 100px;
+$balance_height: 50px;
+
+$row_height: 40px;
+
 body {
   margin: 0;
   min-height: 100vh;

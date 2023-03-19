@@ -1,0 +1,117 @@
+@import '../../../src/index.scss';
+
+.Query {
+    height: 150px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid rgba(34, 34, 34, 1);
+    border-radius: 20px;
+    background-color: rgba(17, 17, 17, 1);
+    box-shadow: 0 0.5rem 1.2rem rgba(82, 85, 92, .15);
+
+    padding: 15px;
+
+    #header {
+        margin: 0;
+        margin-bottom: 20px;
+
+        color: $p_color;
+
+        font-size: 1.7rem;
+        font-family: 'Roboto';
+        font-weight: 500;
+    }
+
+    .inputs {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+
+        width: 450px;
+
+        #address-input {
+            width: 200px;
+            height: 30px;
+
+            border-radius: 10px;
+
+            text-align: center;
+            
+            padding-left: 10px;
+            padding-right: 10px;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #address-input:focus {
+            outline: none;
+        }
+
+        #block-input {
+            width: 100px;
+            height: 30px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            padding-left: 10px;
+            padding-right: 10px;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #block-input:focus {
+            outline: none;
+        }
+
+        #query-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 32px;
+            height: 32px;
+            
+            padding: 0;
+
+            border-radius: 20px;
+
+            img {
+            width: 25spx;
+            height: 20px;
+
+            padding: 0;
+
+            border-radius: 20px;
+            }
+        }
+
+        #query-btn:hover {
+            cursor: pointer;
+            opacity: 0.8;
+        }
+    }
+
+    #notice {
+        margin: 0;
+        margin-top: 20px;
+
+        text-align: center;
+
+        color: $p_color;
+
+        font-size: 0.8rem;
+        font-family: 'Roboto';
+        font-weight: 300;
+    }
+    
+}

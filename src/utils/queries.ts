@@ -79,12 +79,14 @@ const queryTransactions = async (
 
         setTransactions(transactions);
 
-        if(!startBlock) {
-            startBlock = lastestBlock.toString();
+        let blockNum = startBlock;
+
+        if(!blockNum) {
+          blockNum = '0';
         };
 
         setFinished(true);
-        handleQuery(`Query retrieved starting from block #${startBlock}`);
+        handleQuery(`Query retrieved starting from block #${blockNum}`);
   };
 
 const querySpecificDateBalance = async (
