@@ -7,6 +7,54 @@ const etherscanKey: string = process.env.REACT_APP_ETHERSCAN_KEY!;
 const infuraUri: string = process.env.REACT_APP_INFURA_MAINNET_URI!;
 const infuraKey: string = process.env.REACT_APP_INFURA_KEY!;
 
+const getBlockHeight = async (date: Date): Promise<number> => {
+
+    const timeStamp: number = Math.floor(date.getTime() / 1000);
+     
+    let uri: string = `${etherscanUri}?module=block&action=getblocknobytime&timestamp=${timeStamp}&closest=before&apikey=${etherscanKey}`;
+
+    let response: Response = await fetch(uri);
+    let json = await response.json();
+    const block: number = Number(json.result!);
+
+    return block;
+};
+
+const getLatestBlock = async (): Promise<number | ErrorMessage> => {
+
+    const uri = `${infuraUri}/${infuraKey}`;
+
+    const data: object = {
+        "jsonrpc": "2.0",
+        "method": "eth_blockNumber",
+        "params": [],
+        "id": 1
+    };
+    const options: object = {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    };
+
+    const response = await fetch(uri, options);
+    const json = await response.json();
+
+    if(json.error) {
+        const errorMessage: ErrorMessage = {
+            problem: 'Error while reading latest block number',
+            message: json.error.message!,
+            result: json.error.code!
+        };
+        return errorMessage;
+    }else {
+        const latestBlock: number = parseInt(json.result!, 16);
+
+        return latestBlock;
+    };
+};
+
 const getEtherBalance = async (address: string, block?: number): Promise<SpecificBalance | ErrorMessage> => {
     
     if(!block) {
@@ -55,18 +103,6 @@ const getEtherBalance = async (address: string, block?: number): Promise<Specifi
     };
 };
 
-const getBlockHeight = async (date: Date): Promise<number> => {
-
-    const timeStamp: number = Math.floor(date.getTime() / 1000);
-     
-    let uri: string = `${etherscanUri}?module=block&action=getblocknobytime&timestamp=${timeStamp}&closest=before&apikey=${etherscanKey}`;
-
-    let response: Response = await fetch(uri);
-    let json = await response.json();
-    const block: number = Number(json.result!);
-
-    return block;
-};
 
 const getNormalTransactions = async (address: string, startBlock?: number): Promise<FormatedNormalTx[] | ErrorMessage>=> {
 
@@ -172,4 +208,4 @@ const getAllTransactions = async (address: string, startBlock?: number): Promise
     return allTx;
 };
 
-export { getEtherBalance, getBlockHeight, getNormalTransactions, getTokenTransactions, getAllTransactions };
+export { getLatestBlock, getEtherBalance, getBlockHeight, getNormalTransactions, getTokenTransactions, getAllTransactions };

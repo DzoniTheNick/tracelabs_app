@@ -5,8 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import './App.scss';
 import { ErrorMessage, formateDate, FormatedNormalTx, FormatedTokenTx, SpecificBalance } from './utils/utils'
-import { getEtherBalance, getBlockHeight, getAllTransactions } from './utils/mainnet';
-// import { getAllTransactions, getBalanceAtTime, getCurrentEtherBalance } from './utils/goerli';
+import { getLatestBlock, getEtherBalance, getBlockHeight, getAllTransactions } from './utils/mainnet';
 import { errorBackgroundColor, errorBorder, normalBackgroundColor, normalBorder } from './utils/values';
 
 import search from './res/png/search.png';
@@ -76,12 +75,43 @@ const App = () => {
     setFinished(false);
 
     // Checking if block number is valid
+    // Initial frontend check
     if((startBlock as string).length > 0 && (!+startBlock || +startBlock < 0)) {
       if(+startBlock !== 0) {
         setFinished(true);
+        setCurrentBalance('XX.XX');
+        setSpecificBalance('XX.XX');
+        setTransactions([]);
+        setSpecificDate('');
         handleError('Invalid block value!', setBlockBackground, setBlockBorder);
-      } 
+        return;
+      };
     };
+
+    // On chain check (if block exists)
+    const lastestBlock: number | ErrorMessage = await getLatestBlock();
+
+    if((lastestBlock as ErrorMessage).problem) {
+      setFinished(true);
+      setCurrentBalance('XX.XX');
+      setSpecificBalance('XX.XX');
+      setTransactions([]);
+      setSpecificDate('');
+      handleError("Couldn't retrieving latest block number!", setBlockBackground, setBlockBorder);
+      console.error(lastestBlock);
+      return;
+    };
+
+    // Checking if entered block value exists on the blockchain
+    if(+startBlock > lastestBlock) {
+      setFinished(true);
+      setCurrentBalance('XX.XX');
+      setSpecificBalance('XX.XX');
+      setTransactions([]);
+      setSpecificDate('');
+      handleError("Given block value doesn't exist yet!", setBlockBackground, setBlockBorder);
+      return;
+    }
 
     const balance: SpecificBalance | ErrorMessage = await getEtherBalance(address);
 
@@ -91,6 +121,7 @@ const App = () => {
       setCurrentBalance('XX.XX');
       setSpecificBalance('XX.XX');
       setTransactions([]);
+      setSpecificDate('');
       handleError('Invalid address value!', setAddressBackground, setAddressBorder);
       console.error(balance);
       return;
@@ -105,7 +136,7 @@ const App = () => {
     setTransactions(transactions);
 
     setFinished(true);
-    handleQuery(`Query retrieved up to block #${(balance as SpecificBalance).blockHeight}`);
+    handleQuery(`Query retrieved up to block #${startBlock}`);
   };
 
   const querySpecificDateBalance = async (date: string) => {
@@ -115,7 +146,7 @@ const App = () => {
     const formatedDate: Date = new Date(date);
     formatedDate.setUTCHours(0, 0, 0, 0);
 
-    // Checking if entered date is valid
+    // Checking if entered date value is valid
     const beginning: Date = new Date(minDate);
     beginning.setUTCHours(0, 0, 0, 0); 
     const end: Date = new Date();
